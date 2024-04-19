@@ -36,3 +36,6 @@
         - Thus, write miss will invoke a read operation before writing  
     - Transfers between L1 and L2, and between L2 and DRAM are done in units  
     of 64 bytes  
+
+### Questions:
+    - Can we assume that we read/write into DRAM at 64 bytes at a time?
