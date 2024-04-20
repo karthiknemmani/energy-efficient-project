@@ -1,4 +1,5 @@
 import sys
+from Cache import Cache
 
 class CacheSim:
     """
@@ -18,6 +19,17 @@ class CacheSim:
             assert f.name.endswith('.din'), "File must be of type .din"
             self.data = f.readlines()
         
+        # caches
+        self.l1_data = Cache(64, 1, 1 << 15, 5e-10, 0.5, 1, 0)
+        self.l1_instruction = Cache(64, 1, 1 << 15, 5e-10, 0.5, 1, 0)
+        self.l2 = Cache(16, 4, 1 << 18, 5e-9, 0.8, 2, 5e-12)
+        
+        # dram data
+        self.dram_access = 5e-8         # in seconds
+        self.dram_idle = 0.8            # in watts
+        self.dram_active = 4            # in watts
+        self.dram_transfer = 6.4e-10    # in joules
+        
         # cache stats
         self.l1_hits = 0
         self.l1_misses = 0
@@ -33,20 +45,39 @@ class CacheSim:
         """
         Run the cache simulator.
         """
-        def parse_line(line):
+        def parse_line(line: str):
             cols = line.split()
+            
+            assert len(cols) == 3, "Invalid input file format"
             
             # Parse
             type_ = int(cols[0])
             address = int(cols[1], 16)
-            size = int(cols[2])
+            value = int(cols[2])
             
-            return type_, address, size
+            return type_, address, value
         
         for line in self.data:
-            type_, address, size = parse_line(line)
+            type_, address, value = parse_line(line)
             
             # access the data and handle misses accordingly
+            l1_hit, l1_dirty = self.l1_data.access(type_, address) \
+                if type_ in (0, 1) else \
+                self.l1_instruction.access(type_, address)
+            
+            if l1_hit:
+                self.l1_hits += 1
+                
+                # implement eviction if needed
+            else:
+                self.l1_misses += 1
+                l2_hit, l2_dirty = self.l2.access(type_, address)
+                if l2_hit:
+                    self.l2_hits += 1
+                    # implement eviction if needed
+                else:
+                    self.l2_misses += 1
+                    # implement DRAM access
             
             # update hits, misses, energy, access time
 
@@ -61,8 +92,11 @@ class CacheSim:
         
         print("Hits in L1:", self.l1_hits)
         print("Misses in L1:", self.l1_misses)
-        print("L1 Miss Rate: %0.4f\n".format(self.l1_misses / 
-                                           (self.l1_hits + self.l1_misses)))
+        
+        total = self.l1_hits + self.l1_misses
+        miss_rate = self.l1_misses / total if total > 0 else 0
+        
+        print("L1 Miss Rate: %0.4f\n".format(miss_rate))
         
         print("Hits in L2:", self.l2_hits)
         print("Misses in L2:", self.l2_misses)
@@ -83,6 +117,7 @@ def main():
     # Assert that we have an input file
     if len(sys.argv) != 2:
         print("Usage: python CacheSim.py <input_file>")
+        print("File must be a .din file")
         sys.exit(1)
     
     filename = sys.argv[1]
