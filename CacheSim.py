@@ -1,6 +1,8 @@
 import sys
-from Cache import Cache
+from Cache import MemorySystem, Cache, DRAM
+from collections import Counter
 
+# 015.doduc and 026.compress getting type error
 class CacheSim:
     """
     A Dinero-based cache simulator.
@@ -13,33 +15,49 @@ class CacheSim:
             filename (_str_): The name of the Dinero trace file.
         """
         
-        self.name = filename.strip('din')
+        self.name = filename.strip('./Traces/Spec_Benchmark/')
         
         with open(filename, 'r') as f:
             assert f.name.endswith('.din'), "File must be of type .din"
             self.data = f.readlines()
         
         # caches
-        self.l1_data = Cache(64, 1, 1 << 15, 5e-10, 0.5, 1, 0)
-        self.l1_instruction = Cache(64, 1, 1 << 15, 5e-10, 0.5, 1, 0)
-        self.l2 = Cache(16, 4, 1 << 18, 5e-9, 0.8, 2, 5e-12)
+        self.l1_data = Cache(
+            block_size=64,
+            associativity=1,
+            capacity=1 << 15,
+            access_time=5e-10,
+            idle_consumption=0.5,
+            active_consumption=1,
+            transfer_penalty=0,
+            lower_access_time=0,
+            lower_transfer_penalty=0
+        )
+        self.l1_instruction = Cache(
+            block_size=64,
+            associativity=1,
+            capacity=1 << 15,
+            access_time=5e-10,
+            idle_consumption=0.5,
+            active_consumption=1,
+            transfer_penalty=0,
+            lower_access_time=0,
+            lower_transfer_penalty=0
+        )
+        self.l2 = Cache(
+            block_size=64,
+            associativity=4,
+            capacity=1 << 18,
+            access_time=5e-9,
+            idle_consumption=0.8,
+            active_consumption=2,
+            transfer_penalty=5e-12,
+            lower_access_time=5e-10,
+            lower_transfer_penalty=0
+        )
         
-        # dram data
-        self.dram_access = 5e-8         # in seconds
-        self.dram_idle = 0.8            # in watts
-        self.dram_active = 4            # in watts
-        self.dram_transfer = 6.4e-10    # in joules
+        self.dram = DRAM()
         
-        # cache stats
-        self.l1_hits = 0
-        self.l1_misses = 0
-        self.l2_hits = 0
-        self.l2_misses = 0
-        
-        # performance data
-        self.l1_energy = 0
-        self.l2_energy = 0
-        self.access_time = 0
 
     def run(self):
         """
@@ -53,64 +71,101 @@ class CacheSim:
             # Parse
             type_ = int(cols[0])
             address = int(cols[1], 16)
-            value = int(cols[2])
+            value = int(cols[2], 16)
             
             return type_, address, value
         
-        for line in self.data:
+        for i, line in enumerate(self.data):
             type_, address, value = parse_line(line)
             
             # access the data and handle misses accordingly
-            l1_hit, l1_dirty = self.l1_data.access(type_, address) \
-                if type_ in (0, 1) else \
-                self.l1_instruction.access(type_, address)
-            
-            if l1_hit:
-                self.l1_hits += 1
-                
-                # implement eviction if needed
+            if type_ in (0, 1):
+                l1_hit, l1_dirty, evicted_address, evicted_index = \
+                    self.l1_data.access(type_, address)
             else:
-                self.l1_misses += 1
-                l2_hit, l2_dirty = self.l2.access(type_, address)
-                if l2_hit:
-                    self.l2_hits += 1
-                    # implement eviction if needed
-                else:
-                    self.l2_misses += 1
-                    # implement DRAM access
-            
-            # update hits, misses, energy, access time
+                l1_hit, l1_dirty, evicted_address, evicted_index = \
+                    self.l1_instruction.access(type_, address)
 
+            if not l1_hit:
+                if l1_dirty:
+                    # writeback to L2
+                    self.l2.writeback(evicted_address)
+                
+                l2_hit, l2_dirty, evicted_address, evicted_index = self.l2.access(type_, address)
+                
+                if l2_hit:
+                    # bring into L1
+                    if type_ in (0, 1):
+                        self.l1_data.cache_fill(address, evicted_index)
+                    else:
+                        self.l1_instruction.cache_fill(address, evicted_index)
+                else:
+                    if l2_dirty:
+                        self.dram.writeback()
+                        
+                    self.dram.access()
+                    
+                    self.l2.cache_fill(address, evicted_index)
+                    if type_ in (0, 1):
+                        self.l1_data.cache_fill(address, 0)
+                    else:
+                        self.l1_instruction.cache_fill(address, 0)
+                    
+                           
+                
+    def mem_energy(self, memory: MemorySystem):
+        idle_energy = memory.idle_watts() * self.total_time()
+        active_energy = memory.active_energy()
+        return idle_energy + active_energy
+    
+    def total_time(self):
+        return self.l1_data.total_time() + self.l1_instruction.total_time() + \
+            self.l2.total_time() + self.dram.total_time()
+    
+    def total_energy(self):
+        return self.mem_energy(self.l1_data) + self.mem_energy(self.l1_instruction) + \
+            self.mem_energy(self.l2) + self.mem_energy(self.dram)
+    
+    def total_accesses(self):
+        return self.l1_data.get_accesses() + self.l1_instruction.get_accesses() + \
+            self.l2.get_accesses() + self.dram.get_accesses()
+        
     def report(self):
         """
         Output hits, misses, energy consumption, and access time.
         """
-        
+        print("__________________________\n")
         # add units later
-        print("Cache Access Stats for {}".format(self.name))
-        print("__________________________\n")
+        print("Cache Access Stats for {}\n".format(self.name))
+
+        print("Hits in L1 Data:", self.l1_data.get_hits())
+        print("Misses in L1 Data:", self.l1_data.get_misses())
+        print("L1 Data Hit Rate: {:.4f}\n".format(self.l1_data.get_hits() / self.l1_data.get_accesses() if self.l1_data.get_accesses() > 0 else 0))
+
+        print("Hits in L1 Instruction:", self.l1_instruction.get_hits())
+        print("Misses in L1 Instruction:", self.l1_instruction.get_misses())
+        print("L1 Instruction Hit Rate: {:.4f}\n".format(self.l1_instruction.get_hits() / self.l1_instruction.get_accesses() if self.l1_instruction.get_accesses() > 0 else 0))
         
-        print("Hits in L1:", self.l1_hits)
-        print("Misses in L1:", self.l1_misses)
+        print("Hits in L2:", self.l2.get_hits())
+        print("Misses in L2:", self.l2.get_misses())
+        print("L2 Hit Rate: {:.4f}\n".format(self.l2.get_hits() / self.l2.get_accesses() if self.l2.get_accesses() > 0 else 0))
         
-        total = self.l1_hits + self.l1_misses
-        miss_rate = self.l1_misses / total if total > 0 else 0
+        print(f"DRAM Accesses: {self.dram.get_accesses()}\n")
         
-        print("L1 Miss Rate: %0.4f\n".format(miss_rate))
+        print("Performance Stats\n")
+
+        print("Energy Consumption from L1: {:.3f} nJ".format((self.mem_energy(self.l1_data) + self.mem_energy(self.l1_instruction)) * 10 ** 9))
+        print("Energy Consumption from L2: {:.3f} nJ".format(self.mem_energy(self.l2) * 10 ** 9))
+        print("Energy Consumption from DRAM: {:.3f} nJ\n".format(self.mem_energy(self.dram) * 10 ** 9))
         
-        print("Hits in L2:", self.l2_hits)
-        print("Misses in L2:", self.l2_misses)
-        print("L2 Miss Rate: %0.4f\n".format(self.l2_misses / 
-                                           (self.l2_hits + self.l2_misses)))
+        print("Total Energy Consumption: {:.3f} nJ\n".format(self.total_energy() * 10 ** 9))
         
-        print("Performance Stats")
-        print("__________________________\n")
+        print("Total Time: {:.3f} ns".format(self.total_time() * 10 ** 9))
+        print("Average Memory Access Time: {:.3f} ns\n".format((self.total_time() * 10 ** 9) / self.total_accesses()))
         
-        print("Energy Consumption from L1: %0.4f".format(self.l1_energy))
-        print("Energy Consumption from L2: %0.4f\n".format(self.l2_energy))
-        
-        print("Average Memory Access Time: %0.4f".format(self.access_time / len(self.data)))
-        
+        # print(Counter(self.l1_data.valid))
+        # print(Counter(self.l1_instruction.valid))
+        # print(Counter(self.l2.valid))
     
 
 def main():
@@ -120,7 +175,7 @@ def main():
         print("File must be a .din file")
         sys.exit(1)
     
-    filename = sys.argv[1]
+    filename = "./Traces/Spec_Benchmark/" + sys.argv[1]
     
     simulator = CacheSim(filename)
     simulator.run()

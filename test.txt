@@ -1,0 +1,450 @@
+Running CacheSim.py with input 008.espresso.din...
+__________________________
+
+Cache Access Stats for 008.espresso.di
+
+Hits in L1 Data: 189611
+Misses in L1 Data: 1021
+L1 Data Hit Rate: 0.9946
+
+Hits in L1 Instruction: 807013
+Misses in L1 Instruction: 2355
+L1 Instruction Hit Rate: 0.9971
+
+Hits in L2: 2579
+Misses in L2: 797
+L2 Hit Rate: 0.7639
+
+DRAM Accesses: 797
+
+Performance Stats
+
+Energy Consumption from L1: 1057765.000 nJ
+Energy Consumption from L2: 482060.030 nJ
+Energy Consumption from DRAM: 606122.080 nJ
+
+Total Energy Consumption: 2145947.110 nJ
+
+Total Time: 557765.000 ns
+Average Memory Access Time: 0.555 ns
+
+Running CacheSim.py with input 013.spice2g6.din...
+__________________________
+
+Cache Access Stats for 013.spice2g6.di
+
+Hits in L1 Data: 214959
+Misses in L1 Data: 864
+L1 Data Hit Rate: 0.9960
+
+Hits in L1 Instruction: 781217
+Misses in L1 Instruction: 2962
+L1 Instruction Hit Rate: 0.9962
+
+Hits in L2: 2852
+Misses in L2: 974
+L2 Hit Rate: 0.7454
+
+DRAM Accesses: 974
+
+Performance Stats
+
+Energy Consumption from L1: 1068808.500 nJ
+Energy Consumption from L2: 495279.215 nJ
+Energy Consumption from DRAM: 650469.360 nJ
+
+Total Energy Consumption: 2214557.075 nJ
+
+Total Time: 568807.500 ns
+Average Memory Access Time: 0.566 ns
+
+Running CacheSim.py with input 015.doduc.din...
+__________________________
+
+Cache Access Stats for 015.doduc.di
+
+Hits in L1 Data: 241913
+Misses in L1 Data: 2894
+L1 Data Hit Rate: 0.9882
+
+Hits in L1 Instruction: 750732
+Misses in L1 Instruction: 4461
+L1 Instruction Hit Rate: 0.9941
+
+Hits in L2: 4769
+Misses in L2: 2586
+L2 Hit Rate: 0.6484
+
+DRAM Accesses: 2586
+
+Performance Stats
+
+Energy Consumption from L1: 1173468.500 nJ
+Energy Consumption from L2: 625986.140 nJ
+Energy Consumption from DRAM: 1059978.095 nJ
+
+Total Energy Consumption: 2859432.735 nJ
+
+Total Time: 673468.500 ns
+Average Memory Access Time: 0.667 ns
+
+Running CacheSim.py with input 022.li.din...
+__________________________
+
+Cache Access Stats for 022.li.di
+
+Hits in L1 Data: 252744
+Misses in L1 Data: 5005
+L1 Data Hit Rate: 0.9806
+
+Hits in L1 Instruction: 739440
+Misses in L1 Instruction: 2814
+L1 Instruction Hit Rate: 0.9962
+
+Hits in L2: 6500
+Misses in L2: 1319
+L2 Hit Rate: 0.8313
+
+DRAM Accesses: 1319
+
+Performance Stats
+
+Energy Consumption from L1: 1115258.500 nJ
+Energy Consumption from L2: 590867.040 nJ
+Energy Consumption from DRAM: 756849.760 nJ
+
+Total Energy Consumption: 2462975.300 nJ
+
+Total Time: 615257.000 ns
+Average Memory Access Time: 0.610 ns
+
+Running CacheSim.py with input 023.eqntott.din...
+__________________________
+
+Cache Access Stats for 023.eqntott.di
+
+Hits in L1 Data: 228208
+Misses in L1 Data: 2033
+L1 Data Hit Rate: 0.9912
+
+Hits in L1 Instruction: 769542
+Misses in L1 Instruction: 217
+L1 Instruction Hit Rate: 0.9997
+
+Hits in L2: 656
+Misses in L2: 1594
+L2 Hit Rate: 0.2916
+
+DRAM Accesses: 1594
+
+Performance Stats
+
+Energy Consumption from L1: 1095837.000 nJ
+Energy Consumption from L2: 508960.280 nJ
+Energy Consumption from DRAM: 796489.760 nJ
+
+Total Energy Consumption: 2401287.040 nJ
+
+Total Time: 595837.000 ns
+Average Memory Access Time: 0.594 ns
+
+Running CacheSim.py with input 026.compress.din...
+__________________________
+
+Cache Access Stats for 026.compress.di
+
+Hits in L1 Data: 265490
+Misses in L1 Data: 13294
+L1 Data Hit Rate: 0.9523
+
+Hits in L1 Instruction: 721093
+Misses in L1 Instruction: 123
+L1 Instruction Hit Rate: 0.9998
+
+Hits in L2: 7361
+Misses in L2: 6056
+L2 Hit Rate: 0.5486
+
+DRAM Accesses: 6056
+
+Performance Stats
+
+Energy Consumption from L1: 1483532.500 nJ
+Energy Consumption from L2: 990536.660 nJ
+Energy Consumption from DRAM: 2318735.630 nJ
+
+Total Energy Consumption: 4792804.790 nJ
+
+Total Time: 983532.500 ns
+Average Memory Access Time: 0.965 ns
+
+Running CacheSim.py with input 034.mdljdp2.din...
+__________________________
+
+Cache Access Stats for 034.mdljdp2.di
+
+Hits in L1 Data: 229997
+Misses in L1 Data: 1460
+L1 Data Hit Rate: 0.9937
+
+Hits in L1 Instruction: 767392
+Misses in L1 Instruction: 1151
+L1 Instruction Hit Rate: 0.9985
+
+Hits in L2: 1195
+Misses in L2: 1416
+L2 Hit Rate: 0.4577
+
+DRAM Accesses: 1416
+
+Performance Stats
+
+Energy Consumption from L1: 1085943.000 nJ
+Energy Consumption from L2: 499055.775 nJ
+Energy Consumption from DRAM: 752860.640 nJ
+
+Total Energy Consumption: 2337859.415 nJ
+
+Total Time: 585943.000 ns
+Average Memory Access Time: 0.584 ns
+
+Running CacheSim.py with input 039.wave5.din...
+__________________________
+
+Cache Access Stats for 039.wave5.di
+
+Hits in L1 Data: 172033
+Misses in L1 Data: 367
+L1 Data Hit Rate: 0.9979
+
+Hits in L1 Instruction: 827138
+Misses in L1 Instruction: 462
+L1 Instruction Hit Rate: 0.9994
+
+Hits in L2: 87
+Misses in L2: 742
+L2 Hit Rate: 0.1049
+
+DRAM Accesses: 742
+
+Performance Stats
+
+Energy Consumption from L1: 1041488.000 nJ
+Energy Consumption from L2: 441970.815 nJ
+Energy Consumption from DRAM: 582065.280 nJ
+
+Total Energy Consumption: 2065524.095 nJ
+
+Total Time: 541488.000 ns
+Average Memory Access Time: 0.541 ns
+
+Running CacheSim.py with input 047.tomcatv.din...
+__________________________
+
+Cache Access Stats for 047.tomcatv.di
+
+Hits in L1 Data: 374211
+Misses in L1 Data: 10245
+L1 Data Hit Rate: 0.9734
+
+Hits in L1 Instruction: 615454
+Misses in L1 Instruction: 90
+L1 Instruction Hit Rate: 0.9999
+
+Hits in L2: 1787
+Misses in L2: 8548
+L2 Hit Rate: 0.1729
+
+DRAM Accesses: 8548
+
+Performance Stats
+
+Energy Consumption from L1: 1706316.000 nJ
+Energy Consumption from L2: 1142547.615 nJ
+Energy Consumption from DRAM: 3443667.665 nJ
+
+Total Energy Consumption: 6292531.280 nJ
+
+Total Time: 1206316.000 ns
+Average Memory Access Time: 1.184 ns
+
+Running CacheSim.py with input 048.ora.din...
+__________________________
+
+Cache Access Stats for 048.ora.di
+
+Hits in L1 Data: 200000
+Misses in L1 Data: 231
+L1 Data Hit Rate: 0.9988
+
+Hits in L1 Instruction: 799414
+Misses in L1 Instruction: 357
+L1 Instruction Hit Rate: 0.9996
+
+Hits in L2: 46
+Misses in L2: 542
+L2 Hit Rate: 0.0782
+
+DRAM Accesses: 542
+
+Performance Stats
+
+Energy Consumption from L1: 1030145.500 nJ
+Energy Consumption from L2: 430205.655 nJ
+Energy Consumption from DRAM: 532862.480 nJ
+
+Total Energy Consumption: 1993213.635 nJ
+
+Total Time: 530144.500 ns
+Average Memory Access Time: 0.530 ns
+
+Running CacheSim.py with input 085.gcc.din...
+__________________________
+
+Cache Access Stats for 085.gcc.di
+
+Hits in L1 Data: 214473
+Misses in L1 Data: 6012
+L1 Data Hit Rate: 0.9727
+
+Hits in L1 Instruction: 764700
+Misses in L1 Instruction: 14815
+L1 Instruction Hit Rate: 0.9810
+
+Hits in L2: 18329
+Misses in L2: 2498
+L2 Hit Rate: 0.8801
+
+DRAM Accesses: 2498
+
+Performance Stats
+
+Energy Consumption from L1: 1240631.500 nJ
+Energy Consumption from L2: 819582.720 nJ
+Energy Consumption from DRAM: 1102735.670 nJ
+
+Total Energy Consumption: 3162949.890 nJ
+
+Total Time: 740631.500 ns
+Average Memory Access Time: 0.724 ns
+
+Running CacheSim.py with input 089.su2cor.din...
+__________________________
+
+Cache Access Stats for 089.su2cor.di
+
+Hits in L1 Data: 259688
+Misses in L1 Data: 3131
+L1 Data Hit Rate: 0.9881
+
+Hits in L1 Instruction: 736702
+Misses in L1 Instruction: 479
+L1 Instruction Hit Rate: 0.9994
+
+Hits in L2: 696
+Misses in L2: 2914
+L2 Hit Rate: 0.1928
+
+DRAM Accesses: 2914
+
+Performance Stats
+
+Energy Consumption from L1: 1174824.500 nJ
+Energy Consumption from L2: 595887.705 nJ
+Energy Consumption from DRAM: 1129040.435 nJ
+
+Total Energy Consumption: 2899752.640 nJ
+
+Total Time: 674824.500 ns
+Average Memory Access Time: 0.670 ns
+
+Running CacheSim.py with input 090.hydro2d.din...
+__________________________
+
+Cache Access Stats for 090.hydro2d.di
+
+Hits in L1 Data: 239224
+Misses in L1 Data: 12088
+L1 Data Hit Rate: 0.9519
+
+Hits in L1 Instruction: 747777
+Misses in L1 Instruction: 911
+L1 Instruction Hit Rate: 0.9988
+
+Hits in L2: 6700
+Misses in L2: 6299
+L2 Hit Rate: 0.5154
+
+DRAM Accesses: 6299
+
+Performance Stats
+
+Energy Consumption from L1: 1471106.000 nJ
+Energy Consumption from L2: 949785.585 nJ
+Energy Consumption from DRAM: 2320700.410 nJ
+
+Total Energy Consumption: 4741591.995 nJ
+
+Total Time: 971106.000 ns
+Average Memory Access Time: 0.953 ns
+
+Running CacheSim.py with input 093.nasa7.din...
+__________________________
+
+Cache Access Stats for 093.nasa7.di
+
+Hits in L1 Data: 194152
+Misses in L1 Data: 2877
+L1 Data Hit Rate: 0.9854
+
+Hits in L1 Instruction: 802502
+Misses in L1 Instruction: 469
+L1 Instruction Hit Rate: 0.9994
+
+Hits in L2: 375
+Misses in L2: 2971
+L2 Hit Rate: 0.1121
+
+DRAM Accesses: 2971
+
+Performance Stats
+
+Energy Consumption from L1: 1178082.500 nJ
+Energy Consumption from L2: 595888.805 nJ
+Energy Consumption from DRAM: 1149947.445 nJ
+
+Total Energy Consumption: 2923918.750 nJ
+
+Total Time: 678082.500 ns
+Average Memory Access Time: 0.674 ns
+
+Running CacheSim.py with input 094.fpppp.din...
+__________________________
+
+Cache Access Stats for 094.fpppp.di
+
+Hits in L1 Data: 293870
+Misses in L1 Data: 5630
+L1 Data Hit Rate: 0.9812
+
+Hits in L1 Instruction: 691880
+Misses in L1 Instruction: 8620
+L1 Instruction Hit Rate: 0.9877
+
+Hits in L2: 12043
+Misses in L2: 2207
+L2 Hit Rate: 0.8451
+
+DRAM Accesses: 2207
+
+Performance Stats
+
+Energy Consumption from L1: 1193637.500 nJ
+Energy Consumption from L2: 720669.125 nJ
+Energy Consumption from DRAM: 999528.830 nJ
+
+Total Energy Consumption: 2913835.455 nJ
+
+Total Time: 693637.500 ns
+Average Memory Access Time: 0.682 ns
+
