@@ -61,8 +61,6 @@ class Cache(MemorySystem):
         self.valid = [False] * self.num_blocks
         self.dirty = [False] * self.num_blocks
         self.misses = 0
-        
-        self.access_dict = {set: 0 for set in range(sets)}
     
     def get_set(self, address):
         return (address >> self.block_bits) & self.set_mask
@@ -114,8 +112,6 @@ class Cache(MemorySystem):
             curr_dirty[index] = access_type == 1
             
         self.accesses += 1
-        
-        self.access_dict[set_index] += 1
         self.tags[block:block+self.associativity] = curr_tags
         self.valid[block:block+self.associativity] = curr_valid
         self.dirty[block:block+self.associativity] = curr_dirty
@@ -143,6 +139,8 @@ class Cache(MemorySystem):
                 self.writebacks += 1
                 self.dirty[block:block+self.associativity] = curr_dirty
                 break
+        else:
+            raise ValueError("Address not found in cache")
         
 
     

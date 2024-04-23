@@ -2,7 +2,9 @@ import sys
 from Cache import MemorySystem, Cache, DRAM
 from collections import Counter
 
-# 015.doduc and 026.compress getting type error
+
+
+
 class CacheSim:
     """
     A Dinero-based cache simulator.
@@ -22,6 +24,20 @@ class CacheSim:
             self.data = f.readlines()
         
         # caches
+        self.dram = DRAM()
+        
+        self.l2 = Cache(
+            block_size=64,
+            associativity=4,
+            capacity=1 << 18,
+            access_time=5e-9,
+            idle_consumption=0.8,
+            active_consumption=2,
+            transfer_penalty=5e-12,
+            lower_access_time=5e-10,
+            lower_transfer_penalty=0,
+        )
+        
         self.l1_data = Cache(
             block_size=64,
             associativity=1,
@@ -31,7 +47,7 @@ class CacheSim:
             active_consumption=1,
             transfer_penalty=0,
             lower_access_time=0,
-            lower_transfer_penalty=0
+            lower_transfer_penalty=0,
         )
         self.l1_instruction = Cache(
             block_size=64,
@@ -42,21 +58,10 @@ class CacheSim:
             active_consumption=1,
             transfer_penalty=0,
             lower_access_time=0,
-            lower_transfer_penalty=0
-        )
-        self.l2 = Cache(
-            block_size=64,
-            associativity=4,
-            capacity=1 << 18,
-            access_time=5e-9,
-            idle_consumption=0.8,
-            active_consumption=2,
-            transfer_penalty=5e-12,
-            lower_access_time=5e-10,
-            lower_transfer_penalty=0
+            lower_transfer_penalty=0,
         )
         
-        self.dram = DRAM()
+
         
 
     def run(self):
@@ -68,15 +73,14 @@ class CacheSim:
             
             assert len(cols) == 3, "Invalid input file format"
             
-            # Parse
+            # Parse, only need type and address
             type_ = int(cols[0])
             address = int(cols[1], 16)
-            value = int(cols[2], 16)
             
-            return type_, address, value
+            return type_, address
         
         for i, line in enumerate(self.data):
-            type_, address, value = parse_line(line)
+            type_, address = parse_line(line)
             
             # access the data and handle misses accordingly
             if type_ in (0, 1):
@@ -110,25 +114,6 @@ class CacheSim:
                         self.l1_data.cache_fill(address, 0)
                     else:
                         self.l1_instruction.cache_fill(address, 0)
-                    
-                           
-                
-    def mem_energy(self, memory: MemorySystem):
-        idle_energy = memory.idle_watts() * self.total_time()
-        active_energy = memory.active_energy()
-        return idle_energy + active_energy
-    
-    def total_time(self):
-        return self.l1_data.total_time() + self.l1_instruction.total_time() + \
-            self.l2.total_time() + self.dram.total_time()
-    
-    def total_energy(self):
-        return self.mem_energy(self.l1_data) + self.mem_energy(self.l1_instruction) + \
-            self.mem_energy(self.l2) + self.mem_energy(self.dram)
-    
-    def total_accesses(self):
-        return self.l1_data.get_accesses() + self.l1_instruction.get_accesses() + \
-            self.l2.get_accesses() + self.dram.get_accesses()
         
     def report(self):
         """
@@ -166,6 +151,35 @@ class CacheSim:
         # print(Counter(self.l1_data.valid))
         # print(Counter(self.l1_instruction.valid))
         # print(Counter(self.l2.valid))
+    
+    def mem_energy(self, memory: MemorySystem):
+        """
+        Compute the energy consumed by a specific memory structure.
+        """
+        idle_energy = memory.idle_watts() * self.total_time()
+        active_energy = memory.active_energy()
+        return idle_energy + active_energy
+    
+    def total_time(self):
+        """
+        Compute the total time processing all data.
+        """
+        return self.l1_data.total_time() + self.l1_instruction.total_time() + \
+            self.l2.total_time() + self.dram.total_time()
+    
+    def total_energy(self):
+        """
+        Compute the total energy consumed by each memory structure.
+        """
+        return self.mem_energy(self.l1_data) + self.mem_energy(self.l1_instruction) + \
+            self.mem_energy(self.l2) + self.mem_energy(self.dram)
+    
+    def total_accesses(self):
+        """
+        Compute the total number of accesses by each memory structure.
+        """
+        return self.l1_data.get_accesses() + self.l1_instruction.get_accesses() + \
+            self.l2.get_accesses() + self.dram.get_accesses()
     
 
 def main():

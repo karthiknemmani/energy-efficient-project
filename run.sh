@@ -21,6 +21,7 @@ files=(
 
 # Loop through each file and run the Python script with the file as an argument
 for file in "${files[@]}"; do
-    echo "Running CacheSim.py with input $file..."
-    python CacheSim.py "$file"
+    echo "_____________________________________________"
+    echo "Running CacheSimulator.py with input $file..."
+    python CacheSimulator.py "$file"
 done
