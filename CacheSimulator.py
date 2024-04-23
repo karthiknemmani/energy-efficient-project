@@ -5,10 +5,10 @@ import sys
 clock = 0
 
 class L1Cache:
+    """
+    L1 cache class.
+    """
     def __init__(self, l2):
-        global clock
-        
-        clock = 0
         # constants
         self.access_time = 5e-10
         self.idle_consumption = 0.5
@@ -37,26 +37,35 @@ class L1Cache:
         self.misses = 0
 
     def get_set(self, address):
+        """
+        Extract the bits of the address to determine the set index.
+        """
         return (address >> self.block_bits) & self.set_mask
     
     def get_tag(self, address):
+        """
+        Extract the bits of the address to determine the tag.
+        """
         tag_size = 32 - (self.block_bits + self.set_bits)
         return (address >> self.tag_offset) & ((1 << tag_size) - 1)
     
     def read(self, address):
+        """
+        Read a block from the cache. Returns whether or not the block was
+        found in the cache.
+        """
         global clock
         
         self.accesses += 1
         self.total_active_energy += self.active_consumption * self.access_time
         clock += self.access_time
         
-        
-        
         set_index = self.get_set(address)
         tag = self.get_tag(address)
         
         if self.valid[set_index]:
             if tag == self.tags[set_index]:
+                # hit
                 return True
             else:
                 # eviction
@@ -66,6 +75,10 @@ class L1Cache:
             return self.invalid_miss(set_index, tag)
     
     def write(self, address):
+        """
+        Write to a block in cache. Returns whether or not the block was
+        found in the cache.
+        """
         self.accesses += 1
         self.total_active_energy += self.active_consumption * self.access_time
         
@@ -79,27 +92,39 @@ class L1Cache:
                 return True
             else:
                 # eviction
-                return self.evict(set_index, tag)
+                self.evict(set_index, tag)
+                return False
         else:
-            return self.invalid_miss(set_index, tag)
+            # compulsory miss, no eviction
+            self.invalid_miss(set_index, tag)
+            return False
     
     def evict(self, set_index, tag):
+        """
+        Evict a block from the cache. L1 logic is the same as handling
+        a compulsory miss due to directly-mapped nature and 
+        write-through to L2.
+        """
         self.misses += 1   
         self.tags[set_index] = tag
         self.valid[set_index] = True
-        
-        return False
     
     def invalid_miss(self, set_index, tag):
+        """
+        Handle a compulsory miss.
+        """
         self.misses += 1
         self.tags[set_index] = tag
         self.valid[set_index] = True
-        return False
 
     def invalidate(self, address):
+        """
+        Back-invalidate a block from this cache that was just evicted in L2.
+        """
         set_index = self.get_set(address)
         tag = self.get_tag(address)
         
+        # check if the block is in the cache
         if self.valid[set_index] and tag == self.tags[set_index]:
             self.valid[set_index] = False
             self.tags[set_index] = -1
@@ -122,6 +147,9 @@ class L1Cache:
     
     
 class L2Cache:
+    """
+    L2 cache class.
+    """
     def __init__(self, associativity, l1_data, l1_instr, dram):
         self.access_time = 4.5e-9    # account for additive
         self.idle_consumption = 0.8
@@ -153,13 +181,23 @@ class L2Cache:
         self.misses = 0
         
     def get_set(self, address):
+        """
+        Extract the bits of the address to determine the set index.
+        """
         return (address >> self.block_bits) & self.set_mask
     
     def get_tag(self, address):
+        """
+        Extract the bits of the address to determine the tag.
+        """
         tag_size = 32 - (self.block_bits + self.set_bits)
         return (address >> self.tag_offset) & ((1 << tag_size) - 1)
     
     def read(self, address):
+        """
+        Read a block from cache. Returns whether or not the block was
+        found in the cache.
+        """
         global clock
         
         self.accesses += 1
@@ -169,12 +207,15 @@ class L2Cache:
         set_index = self.get_set(address)
         tag = self.get_tag(address)
         
+        # search through the set for the block
         invalid = -1
         for i in range(len(self.tags[set_index])):
             if self.valid[set_index][i]:
                 if tag == self.tags[set_index][i]:
+                    # read hit
                     return True
             else:
+                # mark an invalid block to fill later
                 invalid = i
         
         # we have a miss
@@ -187,47 +228,65 @@ class L2Cache:
             return self.evict(address, False)
         
     def write(self, address):
+        """
+        Write to a block in cache. Returns whether or not the block was
+        found in the cache.
+        """
+        
         self.accesses += 1
         self.total_active_energy += (self.active_consumption * self.access_time + self.transfer_penalty)
         
         set_index = self.get_set(address)
         tag = self.get_tag(address)
         
+        # search through the set for the block
         invalid = -1
         for i in range(len(self.tags[set_index])):
             if self.valid[set_index][i]:
                 if tag == self.tags[set_index][i]:
+                    # write hit
                     self.dirty[set_index][i] = True
                     return True
             else:
+                # mark an invalid block to fill later
                 invalid = i
         
         # we have a miss
         if invalid != -1:
+            # we have an invalid block
             self.invalid_miss(set_index, invalid, tag, True)
             return False
         else:
+            # eviction
             self.evict(address, True)
             return False
     
     def invalid_miss(self, set_index, index, tag, write):
+        """
+        Handle a compulsory miss.
+        """
         self.misses += 1
         self.tags[set_index][index] = tag
         self.valid[set_index][index] = True
         self.dirty[set_index][index] = write
     
     def evict(self, address, write):
+        """
+        Evict a random block from a set in the cache.
+        """
         self.misses += 1
         
         set_index = self.get_set(address)
         tag = self.get_tag(address)
         
+        # randomly select a block to evict
         index = random.randint(0, self.associativity - 1)
         
         # evict from L1 to maintain inclusivity
         self.l1_data.invalidate(address)
         self.l1_instr.invalidate(address)
         
+        # write back to dram if evicted block is dirty
         if self.dirty[set_index][index]:
             self.dram.writeback()
             
@@ -265,6 +324,9 @@ class DRAM:
         self.accesses = 0
     
     def read(self):
+        """
+        Compute the time and energy for a read from DRAM.
+        """
         global clock
         
         self.accesses += 1
@@ -272,6 +334,9 @@ class DRAM:
         self.total_active_energy += (self.active_consumption * self.access_time + self.transfer_penalty)
     
     def writeback(self):
+        """
+        Compute the energy for a writeback to DRAM.
+        """
         self.accesses += 1
         self.total_active_energy += (self.active_consumption * self.access_time + self.transfer_penalty)
     
@@ -321,6 +386,9 @@ class CacheSim:
     """
 
     def read_access(self, address, data=True):
+        """
+        Perform a read.
+        """
         l1_cache = self.l1_data if data else self.l1_instruction
         l1_hit = l1_cache.read(address)
         if not l1_hit:
@@ -329,11 +397,17 @@ class CacheSim:
                 self.dram.read()
 
     def write_access(self, address):
+        """
+        Perform a write.
+        """
         l1_hit = self.l1_data.write(address)
         if not l1_hit:
             self.l2.write(address)
             
     def line_access(self, type_: int, address: int):
+        """
+        Access an address given by a Dinero line.
+        """
         if type_ == 0:
             self.read_access(address, data=True)
         elif type_ == 1:
@@ -447,11 +521,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-            
-            
-            
-                    
-        
-        
-        
-        
